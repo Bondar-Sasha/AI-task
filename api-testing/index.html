@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .defect {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #ff4444;
+        }
+        .defect h3 {
+            margin: 0 0 10px 0;
+            color: #ff4444;
+        }
+        .defect p {
+            margin: 5px 0;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Testing Results</h1>
+        <button onclick="runTests()">Run Tests</button>
+        <div id="results"></div>
+    </div>
+
+    <script src="test_api.js"></script>
+    <script>
+        async function runTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Running tests...</p>';
+
+            try {
+                const validator = new ProductValidator();
+                const defects = await validator.validateProducts();
+
+                let html = '';
+                
+                if (defects.length === 0) {
+                    html = '<p class="success">No defects found! All products are valid.</p>';
+                } else {
+                    html = `<h2>Found ${defects.length} defects:</h2>`;
+                    defects.forEach(defect => {
+                        html += `
+                            <div class="defect">
+                                <h3>${defect.type}</h3>
+                                <p>${defect.message}</p>
+                                ${defect.productId ? `<p>Product ID: ${defect.productId}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                }
+
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 
